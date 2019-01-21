@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
   if (!Array.isArray(newsList)) {
     return next('Something is going wrong.');
   }
-  
+
   res.send(newsList);
 });
 
@@ -38,7 +38,7 @@ router.put('/:id', function(req, res) {
   const newsSource = newsData.sources.find(news => news.id === req.params.id);
 
   if (!newsSource) {
-    res.status(404).send('Unfortunately, source data didn\'t find');
+    res.next('Unfortunately, source data didn\'t find');
   }
 
   newsData.sources = newsData.sources.map(news => {
@@ -56,7 +56,7 @@ router.delete('/:id', function(req, res) {
   const newsSource = newsData.sources.find(news => news.id === req.params.id);
 
   if (!newsSource) {
-    res.status(404).send('Unfortunately, source data didn\'t find');
+    res.next('Unfortunately, source data didn\'t find');
   }
 
   newsData.sources = newsData.sources.filter(news => news.id !== req.params.id);
