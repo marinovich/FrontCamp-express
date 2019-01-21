@@ -6,6 +6,6 @@ module.exports = winston.createLogger({
     winston.format.json(),
   ),
   transports: [
-    new winston.transports.File({ timestamp: true, filename: 'logger.log' })
+    new winston.transports.File({ timestamp: true, filename: 'file.log' })
   ]
 });
