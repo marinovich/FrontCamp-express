@@ -1,11 +1,14 @@
+const bodyParser = require('body-parser');
 const express = require('express');
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const app = express();
 const router = require('./router');
 
-app.set('views', './views')
-app.set('view engine', 'pug');
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true,
+})); 
 
 // express-winston logger makes sense BEFORE the router
 app.use(expressWinston.logger({
