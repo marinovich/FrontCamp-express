@@ -1,36 +1,77 @@
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser')
 const express = require('express');
+const session = require('express-session')
+const mongoose = require('mongoose');
+const passport = require('passport');
+
+const initDB = require('./services/initDB');
+const newsRouter = require('./routers/newsRouter');
+const authRouter = require('./routers/authRouter');
+const requestLogger = require('./routers/middlewares/requestLogger');
+const errorLogger = require('./routers/middlewares/errorLogger');
+const User = require('./db/models/User');
+
 const app = express();
-const router = require('./router');
-const logger = require('./logger');
+const LocalStrategy = require('passport-local').Strategy;
+
+// initiate database
+mongoose.connect('mongodb://localhost/news');
+initDB();
+
+// bodyParser Middleware
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // to support URL-encoded bodies
+app.use(cookieParser());
+
+// express Session
+app.use(session({
+  secret: 'secret',
+  saveUninitialized: true,
+  resave: true,
+}));
+
+// passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy((username, password, done) => {
+  User.getUserByUsername(username, (err, user) => {
+    if (err) throw err;
+
+    if (!user) {
+      return done(null, false, { message: 'Unknown User' });
+    }
+
+    User.comparePassword(password, user.password, (err, isMatch) => {
+      if (err) throw err;
+
+      if (isMatch) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Invalid password' });
+      }
+    });
+  });
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+
+passport.deserializeUser((id, done) => {
+  User.getUserById(id, (err, user) => done(err, user));
+});
 
 app.set('views', './views')
 app.set('view engine', 'pug');
 
-app.use(bodyParser.json());       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true,
-})); 
+// app requests' logger middleware
+app.use('/', requestLogger);
 
-// express-winston logger makes sense BEFORE the router
-app.use('/', (req, res, next) => {
-  logger.log(
-    'info', 
-    `method: ${req.method}, params: ${JSON.stringify(req.params)}, body: ${JSON.stringify(req.body)}`,
-  );
+app.use('/', authRouter);
+app.use('/news', newsRouter);
 
-  next();
-});
-
-// Now we can tell the app to use our routing code:
-app.use('/news', router);
-
-// express-winston errorLogger makes sense AFTER the router.
-app.use((err, req, res, next) => {
-  logger.log('error', err);
-
-  res.render('error', { error: { status: 404, message: err } });
-});
+// app error logger middleware
+app.use(errorLogger);
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
