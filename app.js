@@ -5,7 +5,6 @@ const session = require('express-session')
 const mongoose = require('mongoose');
 const passport = require('passport');
 
-const initDB = require('./services/initDB');
 const newsRouter = require('./routers/newsRouter');
 const authRouter = require('./routers/authRouter');
 const requestLogger = require('./routers/middlewares/requestLogger');
@@ -14,10 +13,14 @@ const User = require('./db/models/User');
 
 const app = express();
 const LocalStrategy = require('passport-local').Strategy;
+const PORT = process.env.PORT || 5000;
 
 // initiate database
-mongoose.connect('mongodb://localhost/news');
-initDB();
+mongoose.connect(
+  // TODO: get rid of showing credentials
+  process.env.DB_URL,
+  (error) => console.log(error),
+);
 
 // bodyParser Middleware
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -48,9 +51,9 @@ passport.use(new LocalStrategy((username, password, done) => {
 
       if (isMatch) {
         return done(null, user);
-      } else {
-        return done(null, false, { message: 'Invalid password' });
       }
+
+      return done(null, false, { message: 'Invalid password' });
     });
   });
 }));
@@ -73,6 +76,6 @@ app.use('/news', newsRouter);
 // app error logger middleware
 app.use(errorLogger);
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(PORT, function () {
+  console.log(`Example app listening on port ${PORT}!`);
 });

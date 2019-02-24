@@ -12,11 +12,11 @@ module.exports = function (req, res, next) {
     });
 
     User.createUser(newUser, (err, user) => {
-      err 
+      err
         ? next(err)
         : res.send(user).end();
     });
   } else {
-    res.status(500).send("{errors: \"Passwords don't match\"}").end();
+    res.status(401).send("{errors: \"Passwords don't match\"}").end();
   }
 };
