@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 5000;
 // initiate database
 mongoose.connect(
   // TODO: get rid of showing credentials
-  process.env.DB_URL,
+  process.env.DATABASE_URL,
   (error) => console.log(error),
 );
 
