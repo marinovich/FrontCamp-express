@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 5000;
 // initiate database
 mongoose.connect(
   // TODO: get rid of showing credentials
-  process.env.DB_URL,
+  process.env.DB_URL || 'mongodb+srv://User:User2019@mycluster-8wvl7.mongodb.net/news?retryWrites=true',
   (error) => console.log(error),
 );
 
