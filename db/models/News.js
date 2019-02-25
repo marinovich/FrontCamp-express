@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 const newsSchema = new Schema({
-  id: {
-    type: String,
-    required: true,
-  },
-  name: {
+  title: {
     type: String,
     required: true,
   },
@@ -14,10 +10,14 @@ const newsSchema = new Schema({
     type: String,
     required: true,
   },
+  content: {
+    type: String,
+    required: true,
+  },
+  publishedAt: String,
+  author: String,
   description: String,
-  category: String,
-  language: String,
-  county: String,
+  urlToImage: String,
 }, { versionKey: false });
 
 module.exports = mongoose.model('News', newsSchema);
