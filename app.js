@@ -26,9 +26,11 @@ mongoose.connect(
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // to support URL-encoded bodies
 app.use(cookieParser());
+app.enable('trust proxy');
 
 // express Session
 app.use(session({
+  proxy: true,
   secret: 'secret',
   saveUninitialized: true,
   resave: true,
