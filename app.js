@@ -73,6 +73,7 @@ app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || 'http://localhost');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   next();
 });
 
